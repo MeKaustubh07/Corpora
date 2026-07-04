@@ -17,12 +17,14 @@ function Collections() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const refresh = () =>
     api
       .listCollections()
       .then(setCollections)
-      .catch((e) => setError(String(e)));
+      .catch((e) => setError(String(e)))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
     refresh();
@@ -36,53 +38,67 @@ function Collections() {
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <h1 className="text-2xl font-semibold">Corpora</h1>
-      <p className="mt-1 text-sm text-neutral-400">
-        Multimodal agentic RAG — upload knowledge, chat with citations.
-      </p>
+    <main className="mx-auto max-w-4xl px-6 py-16">
+      <div className="text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-800 text-2xl font-bold">
+          C
+        </div>
+        <h1 className="mt-5 text-3xl font-semibold tracking-tight">Corpora</h1>
+        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-neutral-400">
+          Turn documents, links, and images into a knowledge base you can talk to —
+          every answer cites its sources.
+        </p>
+      </div>
 
-      <div className="mt-8 flex gap-2">
+      <div className="mx-auto mt-10 flex max-w-lg gap-2">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && create()}
-          placeholder="New collection name…"
-          className="flex-1 rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          placeholder="Name a new collection…"
+          className="flex-1 rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-2.5 text-sm outline-none placeholder:text-neutral-500 focus:border-neutral-500"
         />
         <button
           onClick={create}
-          className="rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-neutral-200"
+          disabled={!name.trim()}
+          className="rounded-xl bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-300 disabled:opacity-40"
         >
           Create
         </button>
       </div>
 
-      {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-6 text-center text-sm text-red-400">{error}</p>}
 
-      <ul className="mt-6 divide-y divide-neutral-800 rounded-lg border border-neutral-800">
+      <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {collections.map((c) => (
-          <li key={c.id} className="flex items-center justify-between px-4 py-3">
-            <Link href={`/c/${c.id}`} className="flex-1 hover:underline">
-              <span className="font-medium">{c.name}</span>
-              {c.description && (
-                <span className="ml-2 text-sm text-neutral-500">{c.description}</span>
-              )}
+          <div
+            key={c.id}
+            className="group relative rounded-xl border border-neutral-800 bg-neutral-900/50 p-4 transition hover:border-neutral-600 hover:bg-neutral-900"
+          >
+            <Link href={`/c/${c.id}`} className="block">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-800 text-sm">
+                📚
+              </div>
+              <h3 className="mt-3 truncate font-medium text-neutral-200">{c.name}</h3>
+              <p className="mt-1 text-xs text-neutral-500">
+                {new Date(c.created_at).toLocaleDateString()}
+              </p>
             </Link>
             <button
               onClick={() => api.deleteCollection(c.id).then(refresh)}
-              className="text-sm text-neutral-500 hover:text-red-400"
+              aria-label={`Delete ${c.name}`}
+              className="absolute right-3 top-3 hidden text-xs text-neutral-600 hover:text-red-400 group-hover:block"
             >
-              delete
+              ✕
             </button>
-          </li>
+          </div>
         ))}
-        {collections.length === 0 && !error && (
-          <li className="px-4 py-6 text-sm text-neutral-500">
-            No collections yet — create one above.
-          </li>
+        {!loading && collections.length === 0 && !error && (
+          <p className="col-span-full py-8 text-center text-sm text-neutral-600">
+            No collections yet — create your first one above.
+          </p>
         )}
-      </ul>
+      </div>
     </main>
   );
 }

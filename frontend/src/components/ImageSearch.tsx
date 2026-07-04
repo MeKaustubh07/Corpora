@@ -52,48 +52,58 @@ export function ImageSearch({ collectionId }: { collectionId: string }) {
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex gap-2">
+    <div className="mx-auto flex h-full max-w-3xl flex-col px-4 py-5">
+      <div className="flex items-end gap-2 rounded-2xl border border-neutral-700/80 bg-neutral-900 p-2 focus-within:border-neutral-500">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && search()}
-          placeholder="Describe an image… e.g. 'diagram with arrows', 'sunset photo'"
-          className="flex-1 rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          placeholder="Describe an image… e.g. 'architecture diagram', 'red logo'"
+          className="flex-1 bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-neutral-500"
         />
         <button
           onClick={search}
-          disabled={busy}
-          className="rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-neutral-200 disabled:opacity-50"
+          disabled={busy || !q.trim()}
+          className="rounded-lg bg-white px-4 py-1.5 text-sm font-medium text-black transition hover:bg-neutral-300 disabled:bg-neutral-700 disabled:text-neutral-400"
         >
-          {busy ? "…" : "Search"}
+          {busy ? "Searching…" : "Search"}
         </button>
       </div>
+      <p className="mt-2 text-center text-[11px] text-neutral-600">
+        CLIP text-to-image search over this collection&apos;s uploaded images.
+      </p>
 
-      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
 
-      <div className="mt-4 grid flex-1 grid-cols-3 gap-3 overflow-y-auto content-start">
+      <div className="mt-5 grid flex-1 grid-cols-2 content-start gap-3 overflow-y-auto sm:grid-cols-3 lg:grid-cols-4">
         {hits.map((h) => (
-          <figure key={h.document_id} className="rounded-lg border border-neutral-800 p-2">
+          <figure
+            key={h.document_id}
+            className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 transition hover:border-neutral-600"
+          >
             {urls[h.document_id] ? (
               // eslint-disable-next-line @next/next/no-img-element -- blob object URL
               <img
                 src={urls[h.document_id]}
                 alt={h.document_name}
-                className="aspect-square w-full rounded object-cover"
+                className="aspect-square w-full object-cover"
               />
             ) : (
-              <div className="aspect-square w-full animate-pulse rounded bg-neutral-900" />
+              <div className="aspect-square w-full animate-pulse bg-neutral-900" />
             )}
-            <figcaption className="mt-1 truncate text-xs text-neutral-400">
-              {h.document_name}{" "}
-              <span className="text-neutral-600">{h.score.toFixed(2)}</span>
+            <figcaption className="flex items-baseline justify-between gap-2 px-2.5 py-1.5">
+              <span className="truncate text-[11px] text-neutral-400">{h.document_name}</span>
+              <span className="shrink-0 font-mono text-[10px] text-neutral-600">
+                {h.score.toFixed(2)}
+              </span>
             </figcaption>
           </figure>
         ))}
       </div>
       {searched && hits.length === 0 && !busy && (
-        <p className="text-sm text-neutral-500">No matching images in this collection.</p>
+        <p className="pb-6 text-center text-sm text-neutral-600">
+          No matching images in this collection.
+        </p>
       )}
     </div>
   );

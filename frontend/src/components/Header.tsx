@@ -13,8 +13,11 @@ export function Header() {
   }, [getToken]);
 
   return (
-    <header className="flex items-center justify-between border-b border-neutral-800 px-6 py-3">
-      <Link href="/" className="text-sm font-semibold tracking-wide">
+    <header className="flex items-center justify-between border-b border-neutral-800 px-4 py-2.5">
+      <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-wide">
+        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-neutral-800 text-xs font-bold">
+          C
+        </span>
         Corpora
       </Link>
       {isSignedIn ? (
