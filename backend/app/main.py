@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from arq import create_pool
@@ -7,12 +8,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import chat, collections, documents, health
 from app.core.config import get_settings
+from app.retrieval.vectorstore import ensure_collections
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
     app.state.arq = await create_pool(RedisSettings.from_dsn(settings.redis_url))
+    # collections + payload indexes must exist before any search hits them
+    await asyncio.to_thread(ensure_collections)
     yield
     await app.state.arq.close()
 

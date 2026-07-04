@@ -49,6 +49,9 @@ def ensure_collections() -> None:
         client.create_payload_index(
             IMAGE_COLLECTION, "tenant_id", models.PayloadSchemaType.KEYWORD
         )
+        client.create_payload_index(
+            IMAGE_COLLECTION, "collection_id", models.PayloadSchemaType.KEYWORD
+        )
 
 
 def _tenant_filter(tenant_id: str, collection_id: str | None) -> models.Filter:
