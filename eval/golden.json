@@ -1,0 +1,31 @@
+{
+  "corpus": ["atlas_handbook.md"],
+  "thresholds": { "faithfulness": 0.7, "relevancy": 0.7, "retrieval_hit_rate": 0.8 },
+  "cases": [
+    {
+      "question": "How much does the AR-7 cost and what payload can it carry?",
+      "must_contain_any": ["42,000", "42000"],
+      "expected_fact": "AR-7 costs 42,000 dollars and carries up to 18 kg"
+    },
+    {
+      "question": "Who founded Atlas Robotics and when?",
+      "must_contain_any": ["Meera", "Okafor"],
+      "expected_fact": "Founded 2019 by Meera Iyer and Daniel Okafor"
+    },
+    {
+      "question": "What happens when lidar calibration drifts too far?",
+      "must_contain_any": ["E-114", "halt"],
+      "expected_fact": "Robot halts and reports error code E-114 beyond 2 degrees drift"
+    },
+    {
+      "question": "When is premium support free?",
+      "must_contain_any": ["25"],
+      "expected_fact": "Free for fleets of 25 or more robots"
+    },
+    {
+      "question": "Compare the AR-3 and AR-7 payload limits.",
+      "must_contain_any": ["18", "6"],
+      "expected_fact": "AR-7: 18 kg, AR-3: 6 kg"
+    }
+  ]
+}

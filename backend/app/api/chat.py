@@ -17,6 +17,7 @@ from app.api.collections import get_owned_collection
 from app.core.security import Principal, get_principal
 from app.db.models import Chat, Message
 from app.db.session import get_db, get_sessionmaker
+from app.observability.tracing import langchain_callbacks
 
 router = APIRouter(prefix="/chats", tags=["chat"])
 
@@ -144,7 +145,8 @@ async def send_message(
             return saved_id
 
         try:
-            async for ev in get_graph().astream_events(state, version="v2"):
+            config = {"callbacks": langchain_callbacks()}
+            async for ev in get_graph().astream_events(state, version="v2", config=config):
                 kind = ev["event"]
                 node = ev.get("metadata", {}).get("langgraph_node", "")
                 if kind == "on_chain_start" and ev.get("name") in NODE_STAGES:
