@@ -10,13 +10,20 @@ def _handler():
     s = get_settings()
     if not (s.langfuse_public_key and s.langfuse_secret_key):
         return None
-    from langfuse.langchain import CallbackHandler
+    try:
+        import os
 
-    return CallbackHandler(
-        public_key=s.langfuse_public_key,
-        secret_key=s.langfuse_secret_key,
-        host=s.langfuse_host,
-    )
+        os.environ.setdefault("LANGFUSE_PUBLIC_KEY", s.langfuse_public_key)
+        os.environ.setdefault("LANGFUSE_SECRET_KEY", s.langfuse_secret_key)
+        os.environ.setdefault("LANGFUSE_HOST", s.langfuse_host)
+        from langfuse.langchain import CallbackHandler
+
+        return CallbackHandler()
+    except Exception as exc:  # noqa: BLE001 — tracing must never break requests
+        import logging
+
+        logging.getLogger(__name__).warning("Langfuse disabled: %s", exc)
+        return None
 
 
 def langchain_callbacks() -> list:
