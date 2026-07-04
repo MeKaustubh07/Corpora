@@ -1,5 +1,8 @@
 # Corpora — Multi-Tenant Multimodal Agentic RAG Platform
 
+**Live demo**: [corpora-kaustubhs-projects-a9040a94.vercel.app](https://corpora-kaustubhs-projects-a9040a94.vercel.app) ·
+**API**: [mikaustubh007-corpora.hf.space](https://mikaustubh007-corpora.hf.space/docs)
+
 Upload any knowledge — PDFs, DOCX, Markdown, URLs, images — and chat with an
 agentic pipeline that plans queries, retrieves with hybrid vector search,
 reranks with a cross-encoder, and streams answers with inline citations.
@@ -59,6 +62,10 @@ through the full pipeline — ingest → agent → judge:
   another tenant's chunks.
 - **Assistant messages persist on client disconnect** — SSE generator saves
   accumulated tokens in a cancellation-shielded `finally`.
+- **CORS enforced in-app, but HF Spaces' edge proxy injects permissive CORS
+  on `*.hf.space`** — verified locally that the middleware blocks foreign
+  origins (400); acceptable for a cookie-less demo API, revisit when Clerk
+  auth is enforced.
 
 ## Run locally
 
