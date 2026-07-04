@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     dense_model: str = "BAAI/bge-small-en-v1.5"
     image_model: str = "Qdrant/clip-ViT-B-32-vision"
     sparse_model: str = "Qdrant/bm25"
+    rerank_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
 
 
 @lru_cache
