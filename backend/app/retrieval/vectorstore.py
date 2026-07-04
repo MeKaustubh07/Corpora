@@ -9,7 +9,7 @@ from functools import lru_cache
 from qdrant_client import QdrantClient, models
 
 from app.core.config import get_settings
-from app.ingest.embedding import dense_dim, embed_query, image_dim
+from app.ingest.embedding import dense_dim, embed_image_query, embed_query, image_dim
 
 TEXT_COLLECTION = "corpora_text"
 IMAGE_COLLECTION = "corpora_images"
@@ -108,6 +108,25 @@ def hybrid_search(
             ),
         ],
         query=models.FusionQuery(fusion=models.Fusion.RRF),
+        limit=limit,
+        with_payload=True,
+    )
+    return list(result.points)
+
+
+def image_search(
+    query: str,
+    tenant_id: str,
+    collection_id: str | None = None,
+    limit: int = 12,
+) -> list[models.ScoredPoint]:
+    """Text-to-image search: CLIP text vector against the image collection."""
+    vec = embed_image_query(query)
+    result = get_client().query_points(
+        IMAGE_COLLECTION,
+        query=vec,
+        using="clip",
+        query_filter=_tenant_filter(tenant_id, collection_id),
         limit=limit,
         with_payload=True,
     )

@@ -16,9 +16,9 @@ COPY . .
 
 # bake embedding + reranker models into the image so cold starts skip downloads
 RUN uv run python -c "\
-from app.ingest.embedding import _dense, _sparse; \
+from app.ingest.embedding import _dense, _sparse, _image, _clip_text; \
 from app.retrieval.reranker import _reranker; \
-_dense(); _sparse(); _reranker()"
+_dense(); _sparse(); _image(); _clip_text(); _reranker()"
 
 RUN mkdir -p uploads && chmod -R 777 uploads .model_cache
 

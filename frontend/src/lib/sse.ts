@@ -1,4 +1,4 @@
-import { API } from "./api";
+import { API, authHeaders } from "./api";
 
 export type SseEvent =
   | { event: "stage"; data: { name: string } }
@@ -15,7 +15,7 @@ export async function* streamMessage(
 ): AsyncGenerator<SseEvent> {
   const res = await fetch(`${API}/chats/${chatId}/messages`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify({ content }),
     signal,
   });

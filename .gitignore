@@ -27,3 +27,6 @@ uploads/
 .idea/
 .vscode/
 .claude-flow/
+
+# claude local config
+.claude/

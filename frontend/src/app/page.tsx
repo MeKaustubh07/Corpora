@@ -3,8 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, type Collection } from "@/lib/api";
+import { RequireAuth } from "@/components/RequireAuth";
 
 export default function Home() {
+  return (
+    <RequireAuth>
+      <Collections />
+    </RequireAuth>
+  );
+}
+
+function Collections() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [name, setName] = useState("");
   const [error, setError] = useState("");

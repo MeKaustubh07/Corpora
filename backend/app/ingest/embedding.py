@@ -31,6 +31,13 @@ def _image():
     return ImageEmbedding(get_settings().image_model, cache_dir=CACHE_DIR)
 
 
+@lru_cache
+def _clip_text():
+    from fastembed import TextEmbedding
+
+    return TextEmbedding(get_settings().clip_text_model, cache_dir=CACHE_DIR)
+
+
 def embed_texts(texts: list[str]) -> tuple[list[list[float]], list[dict]]:
     """Returns (dense vectors, sparse vectors as {indices, values})."""
     dense = [v.tolist() for v in _dense().embed(texts)]
@@ -48,6 +55,11 @@ def embed_query(text: str) -> tuple[list[float], dict]:
 
 def embed_images(paths: list[str]) -> list[list[float]]:
     return [v.tolist() for v in _image().embed(paths)]
+
+
+def embed_image_query(text: str) -> list[float]:
+    """CLIP text encoder — same vector space as image embeddings."""
+    return next(iter(_clip_text().embed([text]))).tolist()
 
 
 def dense_dim() -> int:

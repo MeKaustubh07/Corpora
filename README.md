@@ -6,10 +6,12 @@
 Upload any knowledge — PDFs, DOCX, Markdown, URLs, images — and chat with an
 agentic pipeline that plans queries, retrieves with hybrid vector search,
 reranks with a cross-encoder, and streams answers with inline citations.
+Images are searchable by description via CLIP text-to-image embeddings.
 Retrieval quality is **measured in CI**, not assumed.
 
 **Stack**: FastAPI · LangGraph · Qdrant (hybrid dense+sparse) · FastEmbed ·
-CLIP · Groq (Llama 3.3 70B) · ARQ + Redis · PostgreSQL · Next.js 15 · Langfuse
+CLIP text-to-image search · Groq (Llama 3.3 70B) · ARQ + Redis · PostgreSQL ·
+Next.js 16 · Clerk auth · Langfuse
 
 ## Architecture
 
@@ -43,6 +45,26 @@ through the full pipeline — ingest → agent → judge:
 | Retrieval hit-rate | expected fact present in retrieved chunks (deterministic) | ≥ 0.80 | **1.00** |
 | Faithfulness | LLM judge: answer supported by context | ≥ 0.70 | **1.00** |
 | Answer relevancy | LLM judge: answer addresses question | ≥ 0.70 | **1.00** |
+
+## Performance (Locust, 20 concurrent users, 60s, local stack, single uvicorn worker, M-series MacBook Air)
+
+| Endpoint | p50 | p95 | p99 | Requests | Failures |
+|----------|-----|-----|-----|----------|----------|
+| Hybrid search (embed + Qdrant RRF) | 18 ms | 31 ms | 44 ms | 365 | 0 |
+| List collections (Postgres) | 7 ms | 25 ms | 37 ms | 275 | 0 |
+| List documents | 8 ms | 23 ms | 39 ms | 185 | 0 |
+| Health | 2 ms | 5 ms | 14 ms | 83 | 0 |
+
+908 total requests, 0 failures, 15.8 req/s sustained.
+Reproduce: `uv run locust -f tests/locustfile.py --host http://localhost:8000 --headless -u 20 -r 5 -t 60s`
+
+## Auth
+
+Clerk end to end: the Next.js app gates all pages behind sign-in and attaches
+the session JWT to every API call; the backend verifies RS256 signatures
+against Clerk's JWKS and derives the tenant from the token (`org_id`, falling
+back to `user_id` — every user gets a private tenant). `AUTH_MODE=dev`
+bypasses verification for local development and CI.
 
 ## Decision log
 

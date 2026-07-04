@@ -1,5 +1,18 @@
 export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+type TokenGetter = () => Promise<string | null>;
+let tokenGetter: TokenGetter | null = null;
+
+/** Registered once by AuthBridge so every request carries the Clerk JWT. */
+export function setTokenGetter(fn: TokenGetter) {
+  tokenGetter = fn;
+}
+
+export async function authHeaders(): Promise<Record<string, string>> {
+  const token = tokenGetter ? await tokenGetter() : null;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export type Collection = {
   id: string;
   name: string;
@@ -37,8 +50,8 @@ export type Chat = { id: string; collection_id: string; title: string };
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, {
-    headers: { "Content-Type": "application/json" },
     ...init,
+    headers: { "Content-Type": "application/json", ...(await authHeaders()), ...init?.headers },
   });
   if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
   return res.status === 204 ? (undefined as T) : res.json();
@@ -63,6 +76,7 @@ export const api = {
     form.append("file", file);
     const res = await fetch(`${API}/collections/${cid}/documents`, {
       method: "POST",
+      headers: await authHeaders(),
       body: form,
     });
     if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);

@@ -4,6 +4,7 @@ from pathlib import Path
 import aiofiles
 from arq import ArqRedis
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
+from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -122,6 +123,48 @@ async def delete_document(
         Path(doc.source_uri).unlink(missing_ok=True)
     await db.delete(doc)
     await db.commit()
+
+
+@router.get("/documents/{document_id}/file")
+async def get_document_file(
+    collection_id: str,
+    document_id: str,
+    db: AsyncSession = Depends(get_db),
+    principal: Principal = Depends(get_principal),
+):
+    await get_owned_collection(collection_id, db, principal)
+    doc = await db.get(Document, document_id)
+    if doc is None or doc.tenant_id != principal.tenant_id or doc.source_type == "url":
+        raise HTTPException(status_code=404, detail="File not found")
+    path = Path(doc.source_uri)
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="File missing from storage")
+    return FileResponse(path, filename=doc.name)
+
+
+@router.get("/images/search")
+async def search_images(
+    collection_id: str,
+    q: str,
+    limit: int = 12,
+    db: AsyncSession = Depends(get_db),
+    principal: Principal = Depends(get_principal),
+):
+    """Text-to-image semantic search over CLIP embeddings."""
+    await get_owned_collection(collection_id, db, principal)
+    points = vectorstore.image_search(q, principal.tenant_id, collection_id, limit=limit)
+    return {
+        "query": q,
+        "hits": [
+            {
+                "score": p.score,
+                "document_id": str(p.payload.get("document_id", "")),
+                "document_name": str(p.payload.get("document_name", "")),
+            }
+            for p in points
+            if p.payload
+        ],
+    }
 
 
 @router.get("/search", response_model=SearchResponse)
