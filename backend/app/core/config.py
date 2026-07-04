@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     langfuse_secret_key: str = ""
     langfuse_host: str = "https://cloud.langfuse.com"
 
+    cors_origins: str = "http://localhost:3000"  # comma-separated, or *
+
     upload_dir: str = "uploads"
     max_upload_mb: int = 50
 
