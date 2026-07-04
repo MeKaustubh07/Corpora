@@ -1,6 +1,7 @@
 "use client";
 
 import { SignInButton, useAuth } from "@clerk/nextjs";
+import { LogoMark } from "@/components/Logo";
 
 /** Gates children behind Clerk sign-in; shows a sign-in card when signed out. */
 export function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -11,8 +12,11 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   }
   if (!isSignedIn) {
     return (
-      <div className="mx-auto mt-24 max-w-sm rounded-lg border border-neutral-800 p-8 text-center">
-        <h2 className="text-lg font-semibold">Sign in to Corpora</h2>
+      <div className="mx-4 mt-24 rounded-xl border border-neutral-800 p-8 text-center sm:mx-auto sm:max-w-sm">
+        <div className="mx-auto w-fit">
+          <LogoMark size={40} />
+        </div>
+        <h2 className="mt-4 text-lg font-semibold">Sign in to Corpora</h2>
         <p className="mt-2 text-sm text-neutral-400">
           Your collections and chats are private to your account.
         </p>

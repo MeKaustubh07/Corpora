@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import { setTokenGetter } from "@/lib/api";
+import { LogoWordmark } from "@/components/Logo";
 
 export function Header() {
   const { isSignedIn, getToken } = useAuth();
@@ -14,11 +15,8 @@ export function Header() {
 
   return (
     <header className="flex items-center justify-between border-b border-neutral-800 px-4 py-2.5">
-      <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-wide">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-neutral-800 text-xs font-bold">
-          C
-        </span>
-        Corpora
+      <Link href="/">
+        <LogoWordmark size={24} />
       </Link>
       {isSignedIn ? (
         <UserButton />

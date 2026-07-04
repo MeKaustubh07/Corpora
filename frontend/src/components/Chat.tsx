@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { FiArrowUp } from "react-icons/fi";
 import { api, type ChatMessage, type Citation } from "@/lib/api";
+import { LogoMark } from "@/components/Logo";
 import { streamMessage } from "@/lib/sse";
 
 type Draft = { content: string; stage: string; citations: Citation[] };
@@ -80,9 +82,9 @@ export function Chat({ collectionId }: { collectionId: string }) {
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-4 py-6">
           {empty && (
-            <div className="mt-24 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-800 text-lg font-semibold">
-                C
+            <div className="mt-16 text-center sm:mt-24">
+              <div className="mx-auto w-fit">
+                <LogoMark size={48} />
               </div>
               <h2 className="mt-4 text-xl font-semibold text-neutral-200">
                 Ask anything about this collection
@@ -134,9 +136,7 @@ export function Chat({ collectionId }: { collectionId: string }) {
             aria-label="Send"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-black transition hover:bg-neutral-300 disabled:bg-neutral-700 disabled:text-neutral-400"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <FiArrowUp size={15} strokeWidth={2.5} />
           </button>
         </div>
         <p className="mt-2 text-center text-[11px] text-neutral-600">
@@ -212,12 +212,8 @@ function AssistantBubble({ content, citations }: { content: string; citations: C
 
 function Avatar({ pulse = false }: { pulse?: boolean }) {
   return (
-    <div
-      className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-neutral-800 text-xs font-semibold text-neutral-300 ${
-        pulse ? "animate-pulse" : ""
-      }`}
-    >
-      C
+    <div className={`mt-0.5 shrink-0 ${pulse ? "animate-pulse" : ""}`}>
+      <LogoMark size={26} />
     </div>
   );
 }

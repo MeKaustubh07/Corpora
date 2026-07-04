@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { FiFolder, FiX } from "react-icons/fi";
 import { api, type Collection } from "@/lib/api";
+import { LogoMark } from "@/components/Logo";
 import { RequireAuth } from "@/components/RequireAuth";
 
 export default function Home() {
@@ -40,8 +42,8 @@ function Collections() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-16">
       <div className="text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-800 text-2xl font-bold">
-          C
+        <div className="mx-auto w-fit">
+          <LogoMark size={56} />
         </div>
         <h1 className="mt-5 text-3xl font-semibold tracking-tight">Corpora</h1>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-neutral-400">
@@ -76,8 +78,8 @@ function Collections() {
             className="group relative rounded-xl border border-neutral-800 bg-neutral-900/50 p-4 transition hover:border-neutral-600 hover:bg-neutral-900"
           >
             <Link href={`/c/${c.id}`} className="block">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-800 text-sm">
-                📚
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-800 text-neutral-400">
+                <FiFolder size={15} />
               </div>
               <h3 className="mt-3 truncate font-medium text-neutral-200">{c.name}</h3>
               <p className="mt-1 text-xs text-neutral-500">
@@ -87,9 +89,9 @@ function Collections() {
             <button
               onClick={() => api.deleteCollection(c.id).then(refresh)}
               aria-label={`Delete ${c.name}`}
-              className="absolute right-3 top-3 hidden text-xs text-neutral-600 hover:text-red-400 group-hover:block"
+              className="absolute right-3 top-3 hidden text-neutral-600 hover:text-red-400 group-hover:block"
             >
-              ✕
+              <FiX size={14} />
             </button>
           </div>
         ))}

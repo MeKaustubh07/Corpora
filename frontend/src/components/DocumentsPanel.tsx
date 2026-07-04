@@ -1,6 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { IconType } from "react-icons";
+import {
+  FiFile,
+  FiFileText,
+  FiImage,
+  FiLink,
+  FiUploadCloud,
+  FiX,
+} from "react-icons/fi";
 import { api, type Doc } from "@/lib/api";
 
 const STATUS: Record<Doc["status"], { dot: string; label: string }> = {
@@ -10,13 +19,13 @@ const STATUS: Record<Doc["status"], { dot: string; label: string }> = {
   failed: { dot: "bg-red-400", label: "failed" },
 };
 
-const TYPE_ICON: Record<string, string> = {
-  pdf: "📄",
-  docx: "📝",
-  md: "📝",
-  txt: "📃",
-  url: "🔗",
-  image: "🖼️",
+const TYPE_ICON: Record<string, IconType> = {
+  pdf: FiFileText,
+  docx: FiFileText,
+  md: FiFileText,
+  txt: FiFile,
+  url: FiLink,
+  image: FiImage,
 };
 
 export function DocumentsPanel({ collectionId }: { collectionId: string }) {
@@ -96,9 +105,7 @@ export function DocumentsPanel({ collectionId }: { collectionId: string }) {
             : "border-neutral-700 hover:border-neutral-500 hover:bg-neutral-900"
         }`}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="text-neutral-400">
-          <path d="M12 16V4m0 0L7 9m5-5 5 5M4 20h16" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <FiUploadCloud size={18} className="text-neutral-400" />
         <span className="text-xs font-medium text-neutral-300">Upload files</span>
         <span className="text-[10px] text-neutral-500">pdf · docx · md · txt · images</span>
         <input
@@ -132,12 +139,13 @@ export function DocumentsPanel({ collectionId }: { collectionId: string }) {
       <ul className="-mx-1 flex-1 space-y-0.5 overflow-y-auto">
         {docs.map((d) => {
           const s = STATUS[d.status];
+          const Icon = TYPE_ICON[d.source_type] ?? FiFile;
           return (
             <li
               key={d.id}
               className="group flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] hover:bg-neutral-900"
             >
-              <span className="text-xs">{TYPE_ICON[d.source_type] ?? "📄"}</span>
+              <Icon size={13} className="shrink-0 text-neutral-500" />
               <span className="flex-1 truncate text-neutral-300" title={d.error || d.name}>
                 {d.name}
               </span>
@@ -150,7 +158,7 @@ export function DocumentsPanel({ collectionId }: { collectionId: string }) {
                 aria-label={`Delete ${d.name}`}
                 className="hidden shrink-0 text-neutral-600 hover:text-red-400 group-hover:block"
               >
-                ✕
+                <FiX size={13} />
               </button>
             </li>
           );
